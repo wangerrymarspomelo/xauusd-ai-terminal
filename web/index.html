@@ -731,28 +731,28 @@
           <div class="metric-value" id="valQuality">--</div>
         </div>
         <div class="metric-badge">
-          <div class="metric-label">昨日波幅</div>
+          <div class="metric-label">前一日波幅</div>
           <div class="metric-value" id="valYesterdayRange" style="color: #ff9800;">--</div>
         </div>
         <div class="metric-badge">
-          <div class="metric-label">前 5 日平均波幅</div>
-          <div class="metric-value" id="valAdr5" style="color: #29b6f6;">--</div>
+          <div class="metric-label">PDH 價位</div>
+          <div class="metric-value" id="valPdhPrice" style="color: #00e676;">--</div>
         </div>
         <div class="metric-badge">
-          <div class="metric-label">PDH/PDL 狀態</div>
-          <div class="metric-value" id="valPdhStatus">--</div>
+          <div class="metric-label">PDL 價位</div>
+          <div class="metric-value" id="valPdlPrice" style="color: #ff5252;">--</div>
         </div>
       </div>
 
       <!-- 核心網格佈局 -->
       <div class="grid-2">
-        <!-- 左卡片：步驟五 作戰日誌 -->
+        <!-- 左卡片：當日策略 -->
         <div class="card">
           <div class="card-title">
-            <span>📋 當日作戰日誌 (標準範本)</span>
+            <span>📋 當日策略</span>
             <button class="btn-copy" id="copyJournalBtn">一鍵複製日誌</button>
           </div>
-          <div class="journal-box" id="journalContent">正在載入日誌...</div>
+          <div class="journal-box" id="journalContent">正在載入策略...</div>
         </div>
 
         <!-- 右卡片：TradingView 提醒設置價位 -->
@@ -861,32 +861,21 @@
 - 截圖必須「只能是前一日搭配指標的截圖（不能有額外多日雜訊或無指標圖表）」。
 - 如果截圖不符合規範（例如跨越過多天數、無指標線或無波幅儀表板），請在分析報告最上方明確警示。
 
-【五大步驟標準分析流程】：
-1. 步驟一：前日定性
-   - 判斷前一日是「前日上漲」還是「前日下跌」。
-   - 若前一日未破前天 PDH 和 PDL，標註「震盪收縮日(需搭配TL並觀望)」。
-   - 若前一日為極端急漲 / 急跌，標註「漲動能過激日」或「跌動能過激日」。
-
-2. 步驟二：FIBO 擴展與波幅數據辨識
-   - 辨識圖表右上角儀表板數值：昨日波幅、前五日平均波幅。
-   - 辨識 10 條 FIBO 線價位：1.05, 1.00(PDH/PDL), 0.90, 0.786, 0.70, 0.30, 0.214, 0.10, 0.00(PDL/PDH), -0.05。
-
-3. 步驟三：回調點有效性檢驗 (檢核 7 大取消情境)
-   - 1. 若回調點是前一日的 H1 倒數三根 K 棒則取消
-   - 2. 回調在領域內
-   - 3. PDH 或當日出現反轉空或開盤下跳則取消回調低（易下破）
-   - 4. PDL 或當日出現反轉多或開盤上跳則取消回調高（易上破）
-   - 5. 前一日急跌則取消回調低（易下破）
-   - 6. 前一日急漲則取消回調高（易上破）
-   - 7. 前一日未破前天的 PDH 和 PDL
-   - 鐵律提醒：「使用回調點進場前需觀望且配合 TL 或盤勢轉換」。
-
-4. 步驟四：PDH / PDL 狀態與有效性判定
-   - 檢核 5 大無效與取代判定 (提早休市未滿23根、來回三段、跳價未回補無回調、關盤0.9~1或PDH/PDL注意假突破、關盤0.3~0.7觀望至亞盤END搭配TL)。
-   - 檢核 8 大觀望或有效判定①~⑧。
-   - 檢核 4 大特殊情形 (反轉收回重畫領域、收回轉折區等回調領域、不破非反轉先回調再破可用當日回調、強趨勢破搭配TL)。
-
-5. 步驟五：產出當日對應策略與作戰日誌
+【核心推演與分析規範】：
+1. 第一項：前日定性
+   - 僅能輸出：前日上漲、前日下跌、震盪收縮日、漲動能過激日、跌動能過激日。
+   - ★嚴格禁令：絕對刪除且不可出現「陽線」或「陰線」！
+2. 第二項：前一日波幅
+   - 僅需顯示圖表右上角儀表板中的「昨日波幅」數值（例如 4268），不需顯示五日均值。
+3. 第三項：PDH 價位、PDL 價位
+   - 明確辨識圖表上的「昨日最高價 (PDH)」與「昨日最低價 (PDL)」具體數值。
+4. 第四項：今日策略
+   - 依據系統五步驟核心邏輯（回調點 7 大取消情境、PDH/PDL 5 大無效取代、8 大觀望有效判定、4 大特殊情形）推導今日策略。
+   - ★極致核心鐵律★：全篇策略內容「嚴禁出現任何 FIBO 的比例數字（絕對不能出現 0.786、0.214、0.9、0.1、1.05、-0.05、0.618、0.5、0.3、0.7 等）」！
+   - 所有轉折區、領域未破區、假突破區等位置，請一律換算為圖表上的「實際具體價位」（例如：「回調至 2654.20 附近配合 TL 突破進多」、「突破 2685.10 假突破且反轉收回時重畫領域逆勢操作」）。只要價位，不要 FIBO 數字！
+5. 第五項：重要經濟數據 (台灣時間)
+   - 列出當日（或最新交易日）對黃金有重大影響的美國經濟數據（如 CPI、PPI、非農 NFP、初請失業金、FOMC 利率決議、PMI、GDP 等）及其對應的「台灣時間（UTC+8，24小時制）」。
+   - 若當日無一級重大數據，請標註「今日無重大美國一級經濟數據公布 (常規關注美股開盤 21:30 動能)」。
 
 【回測風控三大鐵律】：
 1. 拒絕在同一個盤勢裡多次試單。
@@ -899,31 +888,27 @@
 {
   "is_valid_screenshot": true,
   "validation_note": "截圖符合規範：包含前一日完整K棒與指標數值",
-  "daily_journal": {
+  "daily_strategy": {
     "date": "2026-XX-XX",
-    "step1_quality": "前日上漲 / 前日下跌 / [標註：震盪收縮日(需搭配TL並觀望) / 漲動能過激日 / 跌動能過激日]",
-    "step2_range": {
-      "yesterday_range": "XXXX",
-      "adr5": "XXXX"
-    },
-    "step3_pullback": {
-      "has_pullback": "是 / 否",
-      "close_region": "例如：0.7~0.9 / 0.3~0.7 / 0.1~0.3 / 領域內 0~0.1 等",
-      "is_gap": "正常無跳價 / 開盤上跳 / 開盤下跳",
-      "use_prev_two_days_pdh_pdl": "是 / 否"
-    },
-    "step4_pdh_pdl_validity": "有效 / 觀望 / SL要多抓 / 領域失效(等亞盤END) / 重畫領域",
-    "step5_strategy": "寫出今日用此系統採取什麼策略"
+    "item1_quality": "前日上漲 / 前日下跌 / 震盪收縮日 / 漲動能過激日 / 跌動能過激日",
+    "item2_yesterday_range": "XXXX",
+    "item3_pdh": "XXXX.XX",
+    "item3_pdl": "XXXX.XX",
+    "item4_strategy": "今日採取之具體作戰策略（全篇無任何 FIBO 數字，皆以實際具體價位呈現）",
+    "item5_economic_data": [
+      "20:30 美國 9 月 CPI 年率及核心 CPI 月率 (重大)",
+      "22:00 美國 10 月密西根大學消費者信心指數"
+    ]
   },
   "alerts_to_set": [
     {
-      "name": "0.786 黃金深水區多單提醒",
+      "name": "轉折深水區多單提醒 (具體價位)",
       "price": "XXXX.XX",
       "condition": "價格向下穿越",
       "action_reminder": "配合 M15 TL 突破進場，首探 H1 不破出手"
     }
   ],
-  "master_analysis_summary": "交易大師對當前局勢的專業剖析與操作叮嚀"
+  "master_analysis_summary": "交易大師對當前局勢的專業剖析與操作叮嚀（同樣嚴禁出現 FIBO 數字，皆以實際價位說明）"
 }
 \`\`\`
 `;
@@ -1224,35 +1209,77 @@
 
     // 渲染分析結果
     function renderResults(data) {
-      const j = data.daily_journal || {};
+      const s = data.daily_strategy || data.daily_journal || {};
 
-      document.getElementById('valQuality').innerText = j.step1_quality || '--';
-      document.getElementById('valYesterdayRange').innerText = (j.step2_range && j.step2_range.yesterday_range) || '--';
-      document.getElementById('valAdr5').innerText = (j.step2_range && j.step2_range.adr5) || '--';
-      document.getElementById('valPdhStatus').innerText = j.step4_pdh_pdl_validity || '--';
+      // 提取五大項目
+      const quality = s.item1_quality || s.step1_quality || '--';
+      const range = s.item2_yesterday_range || (s.step2_range && s.step2_range.yesterday_range) || '--';
+      const pdh = s.item3_pdh || (s.item3_pdh_pdl && s.item3_pdh_pdl.pdh_price) || (s.step3_pdh_pdl && s.step3_pdh_pdl.pdh_price) || (data.fib_levels && data.fib_levels.p_100_pdh_pdl) || '--';
+      const pdl = s.item3_pdl || (s.item3_pdh_pdl && s.item3_pdh_pdl.pdl_price) || (s.step3_pdh_pdl && s.step3_pdh_pdl.pdl_price) || (data.fib_levels && data.fib_levels.p_000_pdl_pdh) || '--';
+      let strategy = s.item4_strategy || s.step5_strategy || '--';
+      let econData = s.item5_economic_data || s.economic_data || [];
+
+      // 嚴格刪除陰陽線字眼
+      const cleanQuality = quality.replace(/[\(（]?(陽線|陰線)[\)）]?/g, '').trim();
+
+      // 頂部 4 大指標卡
+      document.getElementById('valQuality').innerText = cleanQuality;
+      document.getElementById('valYesterdayRange').innerText = range;
+      document.getElementById('valPdhPrice').innerText = pdh;
+      document.getElementById('valPdlPrice').innerText = pdl;
+
+      // 經濟數據處理 (台灣時間)
+      let econLines = [];
+      if (Array.isArray(econData) && econData.length > 0) {
+        econData.forEach(e => {
+          if (typeof e === 'object' && e !== null) {
+            econLines.push(`  * ${e.time_tw || ''} ${e.event || ''} ${e.impact ? `(${e.impact})` : ''}`.trim());
+          } else if (typeof e === 'string' && e.trim()) {
+            econLines.push(`  * ${e.trim()}`);
+          }
+        });
+      }
+      if (econLines.length === 0) {
+        econLines.push('  * 今日無重大美國一級經濟數據公布');
+      }
+      const econText = econLines.join('\n');
+
+      // 確保排除任何可能殘留的 FIBO 比例數字
+      strategy = strategy
+        .replace(/FIBO\s*0\.786/gi, '轉折深水區')
+        .replace(/FIBO\s*0\.214/gi, '轉折深水區')
+        .replace(/FIBO\s*0\.9(0)?/gi, '領域未破區')
+        .replace(/FIBO\s*0\.1(0)?/gi, '領域未破區')
+        .replace(/FIBO\s*1\.05/gi, '假突破區')
+        .replace(/FIBO\s*-0\.05/gi, '假突破區')
+        .replace(/FIBO\s*0\.7(0)?/gi, '轉折區上緣')
+        .replace(/FIBO\s*0\.3(0)?/gi, '轉折區下緣')
+        .replace(/0\.786/g, '轉折價位')
+        .replace(/0\.214/g, '轉折價位');
 
       const formattedJournal = 
-`【日期】：${j.date || new Date().toISOString().split('T')[0]}
-【步驟一：前日定性】：${j.step1_quality || '未定性'}
+`📋 當日策略
+【日期】：${s.date || new Date().toISOString().split('T')[0]}
 
-【步驟二：波幅數據】：
-  * 昨日波幅：${(j.step2_range && j.step2_range.yesterday_range) || '無數據'}
-  * 前五日平均波幅：${(j.step2_range && j.step2_range.adr5) || '無數據'}
+一、前日定性：
+${cleanQuality}
 
-【步驟三：回調點判定】：
-  * 是否回調：${(j.step3_pullback && j.step3_pullback.has_pullback) || '否'}
-  * 收盤區域在哪：${(j.step3_pullback && j.step3_pullback.close_region) || '領域外'}
-  * 是否上跳或下跳：${(j.step3_pullback && j.step3_pullback.is_gap) || '正常無跳價'}
-  * 使用前天 PDH 和 PDL：${(j.step3_pullback && j.step3_pullback.use_prev_two_days_pdh_pdl) || '否'}
+二、前一日波幅：
+${range}
 
-【步驟四：PDH / PDL 有效性】：
-  * 判定結果：${j.step4_pdh_pdl_validity || '觀望'}
+三、PDH / PDL 價位：
+  * PDH 價位：${pdh}
+  * PDL 價位：${pdl}
 
-【步驟五：當日策略】：
-  * 今日策略：${j.step5_strategy || '觀望至亞盤 END'}`;
+四、今日策略：
+${strategy}
+
+五、重要經濟數據 (台灣時間)：
+${econText}`;
 
       document.getElementById('journalContent').innerText = formattedJournal;
 
+      // 渲染提醒設置價位
       const alertListEl = document.getElementById('alertList');
       alertListEl.innerHTML = '';
       const alerts = data.alerts_to_set || [];
@@ -1261,13 +1288,29 @@
         alertListEl.innerHTML = '<div style="color: #888; font-size: 13px;">無特殊提醒價位需設置。</div>';
       } else {
         alerts.forEach((alt) => {
+          let alertName = (alt.name || '關鍵價位提醒')
+            .replace(/FIBO\s*0\.786/gi, '轉折區')
+            .replace(/FIBO\s*0\.214/gi, '轉折區')
+            .replace(/0\.786/g, '轉折區')
+            .replace(/0\.214/g, '轉折區')
+            .replace(/1\.05/g, '假突破區')
+            .replace(/-0\.05/g, '假突破區')
+            .replace(/0\.9(0)?/g, '領域區')
+            .replace(/0\.1(0)?/g, '領域區');
+
+          let alertAction = (alt.action_reminder || '觀察反應')
+            .replace(/FIBO\s*0\.786/gi, '轉折區')
+            .replace(/FIBO\s*0\.214/gi, '轉折區')
+            .replace(/0\.786/g, '轉折價位')
+            .replace(/0\.214/g, '轉折價位');
+
           const item = document.createElement('div');
           item.className = 'alert-item';
           item.innerHTML = `
             <div class="alert-left">
-              <div class="alert-name">${alt.name || '價格提醒'}</div>
+              <div class="alert-name">${alertName}</div>
               <div class="alert-meta">條件：${alt.condition || '觸碰'}</div>
-              <div class="alert-meta" style="color: #90caf9;">動作：${alt.action_reminder || '觀察反應'}</div>
+              <div class="alert-meta" style="color: #90caf9;">動作：${alertAction}</div>
             </div>
             <div class="alert-right">
               <div class="alert-price">${alt.price || '--'}</div>
@@ -1278,7 +1321,13 @@
         });
       }
 
-      document.getElementById('masterSummary').innerHTML = (data.master_analysis_summary || '保持耐心，嚴守風控紀律。').replace(/\n/g, '<br>');
+      let summary = (data.master_analysis_summary || '保持耐心，嚴守風控紀律。')
+        .replace(/FIBO\s*0\.786/gi, '轉折區')
+        .replace(/FIBO\s*0\.214/gi, '轉折區')
+        .replace(/0\.786/g, '轉折價位')
+        .replace(/0\.214/g, '轉折價位');
+
+      document.getElementById('masterSummary').innerHTML = summary.replace(/\n/g, '<br>');
       resultSection.style.display = 'block';
       resultSection.scrollIntoView({ behavior: 'smooth' });
     }
