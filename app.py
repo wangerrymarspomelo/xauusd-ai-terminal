@@ -149,7 +149,7 @@ class TradingSystemHandler(SimpleHTTPRequestHandler):
                 self.respond_json(400, {"error": "請提供 Gemini API Key！可在介面輸入或設定 GEMINI_API_KEY 環境變數。"})
                 return
 
-            model_name = data.get("model", "gemini-2.5-flash")
+            model_name = data.get("model", "gemini-3.8-flash")
             image_b64 = data.get("image_base64", "")
             if not image_b64:
                 self.respond_json(400, {"error": "未提供圖片資料！"})
@@ -166,12 +166,28 @@ class TradingSystemHandler(SimpleHTTPRequestHandler):
             else:
                 mime_type = "image/png"
 
-            # 呼叫 Gemini REST API
-            gemini_result = self.call_gemini_vision(api_key, model_name, image_b64, mime_type)
-            self.respond_json(200, gemini_result)
+            # 呼叫 Gemini REST API (支援候選模型自動容錯降級)
+            candidate_models = [model_name, "gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+            seen = set()
+            unique_models = [m for m in candidate_models if not (m in seen or seen.add(m))]
+
+            last_err = None
+            for m in unique_models:
+                try:
+                    gemini_result = self.call_gemini_vision(api_key, m, image_b64, mime_type)
+                    self.respond_json(200, gemini_result)
+                    return
+                except Exception as e:
+                    last_err = e
+                    err_str = str(e)
+                    if "404" in err_str or "no longer available" in err_str or "not found" in err_str:
+                        continue
+                    raise e
+            if last_err:
+                raise last_err
 
         except Exception as e:
-            self.respond_json(500, {"error": f"伺服器內部錯誤: {str(e)}"})
+            self.respond_json(500, {"error": f"伺服器錯誤: {str(e)}"})
 
     def call_gemini_vision(self, api_key, model_name, image_b64, mime_type):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"

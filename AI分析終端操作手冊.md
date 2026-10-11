@@ -24,7 +24,7 @@
 1. 點擊網頁上的按鈕或前往 [Google AI Studio](https://aistudio.google.com/)，登入 Google 帳號。
 2. 點擊左上角「Get API key」→「Create API key in new project」取得一串以 `AIzaSy` 開頭的金鑰。
 3. 貼到網頁上方的 **Gemini API Key** 輸入框中（系統會自動保存在使用者個人的瀏覽器中，下次打開無需重複輸入）。
-4. 模型預設選擇 **`gemini-2.5-flash`**（速度極快、繁體中文盤面理解最精準）。
+4. 模型預設選擇 **`gemini-3.8-flash`**（官方推薦最新、極速、繁體中文盤面理解最精準）。
 
 > 💡 **常見疑問保證**：
 > - **100% 完全免費**：Google 官方提供個人帳號免費配額，無須綁定信用卡。

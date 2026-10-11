@@ -677,9 +677,10 @@
       <div class="input-group" style="max-width: 220px;">
         <label for="modelSelect">模型：</label>
         <select id="modelSelect" class="input-field">
-          <option value="gemini-2.5-flash" selected>gemini-2.5-flash (推薦極速)</option>
-          <option value="gemini-1.5-flash">gemini-1.5-flash (穩定)</option>
-          <option value="gemini-1.5-pro">gemini-1.5-pro (深度推理)</option>
+          <option value="gemini-3.8-flash" selected>gemini-3.8-flash (官方推薦極速)</option>
+          <option value="gemini-2.0-flash">gemini-2.0-flash (穩定推薦)</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash (標準相容)</option>
+          <option value="gemini-1.5-pro">gemini-1.5-pro (深度長文推理)</option>
         </select>
       </div>
     </div>
@@ -1092,8 +1093,40 @@
       }
     });
 
-    // 瀏覽器端安全直連 Google Gemini API
-    async function callGeminiDirectly(apiKey, model, imageBase64) {
+    // 瀏覽器端安全直連 Google Gemini API (支援智慧自動降級容錯切換)
+    async function callGeminiDirectly(apiKey, preferredModel, imageBase64) {
+      // 容錯備選模型清單：優先嘗試使用者選擇的模型，遇到 404/不可用則自動嘗試替代模型
+      const candidateModels = [
+        preferredModel,
+        'gemini-3.8-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash'
+      ];
+      const uniqueModels = [...new Set(candidateModels)];
+
+      let lastError = null;
+      for (const model of uniqueModels) {
+        try {
+          return await executeGeminiRequest(apiKey, model, imageBase64);
+        } catch (err) {
+          lastError = err;
+          // 若為 404 或該模型對新用戶不可用，自動切換至備用模型重試
+          if (err.message && (
+            err.message.includes('404') || 
+            err.message.includes('no longer available') || 
+            err.message.includes('not found')
+          )) {
+            console.warn(`[Gemini Fallback] 模型 ${model} 不可用，正在自動切換備用模型...`);
+            continue;
+          }
+          // 其他類型錯誤（如金鑰無效、格式錯誤等）直接拋出
+          throw err;
+        }
+      }
+      throw lastError;
+    }
+
+    async function executeGeminiRequest(apiKey, model, imageBase64) {
       let mimeType = 'image/png';
       let cleanB64 = imageBase64;
       if (imageBase64.includes(',')) {
