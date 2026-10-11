@@ -133,6 +133,27 @@
       cursor: pointer;
     }
 
+    .btn-guide-link {
+      background: rgba(245, 215, 80, 0.12);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-guide-link:hover {
+      background: var(--gold);
+      color: #000;
+    }
+
     /* 上傳區域 */
     .upload-section {
       display: grid;
@@ -437,6 +458,179 @@
       color: #fff;
     }
 
+    /* 教學彈窗 Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      max-width: 660px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(245, 215, 80, 0.15);
+      padding: 26px;
+      position: relative;
+      animation: modalIn 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      font-size: 26px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+    }
+
+    .modal-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .features-strip {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .feature-tag {
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .guide-step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      background: var(--gold);
+      color: #000;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .step-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #cfd8dc;
+    }
+
+    .direct-btn {
+      display: inline-block;
+      background: var(--gold);
+      color: #000;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .direct-btn:hover {
+      background: var(--gold-hover);
+    }
+
+    .faq-section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+
+    .faq-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .faq-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
     /* Toast 通知 */
     #toast {
       position: fixed;
@@ -469,7 +663,7 @@
         <span class="badge-mode" id="envModeBadge">雲端直連模式</span>
       </div>
       <div>
-        <a href="https://aistudio.google.com/" target="_blank" style="font-size: 12px; color: var(--gold); text-decoration: none;">🔑 免費獲取 Gemini API Key</a>
+        <button class="btn-guide-link" id="openGuideBtn">📘 30秒免費取得 API Key 教學</button>
       </div>
     </header>
 
@@ -477,7 +671,8 @@
     <div class="config-card">
       <div class="input-group">
         <label for="apiKeyInput">Gemini API Key：</label>
-        <input type="password" id="apiKeyInput" class="input-field" placeholder="請在此貼上您的 Google Gemini API Key" />
+        <input type="password" id="apiKeyInput" class="input-field" placeholder="貼上以 AIzaSy 開頭的 API Key" />
+        <button class="btn-guide-link" id="openGuideBtn2" style="font-size: 11px; padding: 4px 8px;">如何取得？</button>
       </div>
       <div class="input-group" style="max-width: 220px;">
         <label for="modelSelect">模型：</label>
@@ -583,6 +778,75 @@
     </div>
   </div>
 
+  <!-- 新手 API Key 申請指引 Modal -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="closeGuideBtn">&times;</button>
+      <div class="modal-title">🔑 30 秒免費獲取 Google Gemini API Key</div>
+      <div class="modal-subtitle">僅需有 Google 帳號即可免費領取，無任何門檻、終身免費使用！</div>
+
+      <div class="features-strip">
+        <span class="feature-tag">✓ 100% 完全免費</span>
+        <span class="feature-tag">✓ 免綁信用卡</span>
+        <span class="feature-tag">✓ 每日上千次免費分析額度</span>
+        <span class="feature-tag">✓ 本機安全儲存</span>
+      </div>
+
+      <!-- 步驟 1 -->
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">前往 Google AI Studio 官網</div>
+          <div class="step-desc">使用您的 Google / Gmail 帳號直接登入官方開發者平台。</div>
+          <a href="https://aistudio.google.com/" target="_blank" class="direct-btn">👉 點我直達 Google AI Studio (開新分頁) ↗</a>
+        </div>
+      </div>
+
+      <!-- 步驟 2 -->
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">建立 API Key（點擊兩下即可）</div>
+          <div class="step-desc">
+            進入頁面後：<br>
+            1. 點擊畫面左上角的藍色按鈕 <strong>「Get API key」</strong>。<br>
+            2. 點擊彈窗中的 <strong>「Create API key」</strong>（若跳出條款，勾選同意）。<br>
+            3. 選擇 <strong>「Create API key in new project」</strong> 即會自動生成一串金鑰。
+          </div>
+          <div class="step-box">
+            💡 小提示：金鑰格式為一長串英數文字，開頭通常為 <code>AIzaSy...</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步驟 3 -->
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">複製並貼回本交易終端</div>
+          <div class="step-desc">
+            點擊金鑰旁邊的 <strong>「Copy」</strong> 按鈕複製，接著回到本網站：<br>
+            貼入上方的 <strong>「Gemini API Key」</strong> 輸入框即可！
+          </div>
+          <div class="step-box" style="border-color: rgba(0, 230, 118, 0.4); color: var(--green);">
+            🔒 安全保障：本系統會將金鑰保存在您的手機/電腦瀏覽器裡，下次打開免重新輸入，且絕不會上傳至任何伺服器！
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="faq-section">
+        <div class="faq-title">常見問答 (FAQ)</div>
+        <div class="faq-item"><strong>Q: 會不小心被扣款嗎？</strong><br>A: 絕對不會！Google 提供給所有個人帳號免費額度（Free of charge），無需輸入信用卡。</div>
+        <div class="faq-item"><strong>Q: 朋友或學員也可以自己申請嗎？</strong><br>A: 可以！每個人用自己的 Google 帳號領取一組，大家都能享有每日獨立的免費配額，互不干擾。</div>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="btn btn-gold" id="gotItBtn" style="width: 100%; justify-content: center;">我已了解，返回貼上金鑰 🚀</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast">已成功複製到剪貼簿！</div>
 
@@ -678,6 +942,32 @@
     const toast = document.getElementById('toast');
     const envModeBadge = document.getElementById('envModeBadge');
 
+    // Modal 元素
+    const guideModal = document.getElementById('guideModal');
+    const openGuideBtn = document.getElementById('openGuideBtn');
+    const openGuideBtn2 = document.getElementById('openGuideBtn2');
+    const closeGuideBtn = document.getElementById('closeGuideBtn');
+    const gotItBtn = document.getElementById('gotItBtn');
+
+    function openModal() { guideModal.classList.add('active'); }
+    function closeModal() { guideModal.classList.remove('active'); }
+
+    openGuideBtn.addEventListener('click', openModal);
+    if (openGuideBtn2) openGuideBtn2.addEventListener('click', openModal);
+    closeGuideBtn.addEventListener('click', closeModal);
+    gotItBtn.addEventListener('click', () => {
+      closeModal();
+      apiKeyInput.focus();
+    });
+
+    guideModal.addEventListener('click', (e) => {
+      if (e.target === guideModal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && guideModal.classList.contains('active')) closeModal();
+    });
+
     let currentBase64Image = null;
     let latestAnalysisResult = null;
 
@@ -755,8 +1045,7 @@
     startAnalyzeBtn.addEventListener('click', async () => {
       const apiKey = apiKeyInput.value.trim();
       if (!apiKey) {
-        alert('請先輸入 Google Gemini API Key！');
-        apiKeyInput.focus();
+        openModal();
         return;
       }
       if (!currentBase64Image) {
@@ -770,7 +1059,6 @@
 
       try {
         let data;
-        // 優先嘗試後端，若失敗或處於純靜態雲端則直連 Google 官方 API
         if (isLocalServer) {
           try {
             const resp = await fetch('/api/analyze', {
