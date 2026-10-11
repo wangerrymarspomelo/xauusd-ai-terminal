@@ -1,0 +1,11 @@
+# 忽略敏感教材與私密大圖 (保護著作與隱私)
+*.pdf
+*.jpg
+*.png
+.env
+
+# 忽略本機暫存與記錄檔
+scratch/
+logs/
+__pycache__/
+*.pyc

@@ -1,0 +1,251 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ghbf8728 & Antigravity (God of XAUUSD Edition)
+//@version=5
+
+indicator("XAUUSD 領域系統：每日波幅+三點斐波擴展 [完美對齊版]", overlay = true, max_lines_count = 500, max_labels_count = 500)
+
+// ==========================================
+// 1. 核心設定與資料來源
+// ==========================================
+group_src   = "資料來源與對齊模式"
+calc_mode   = input.string("圖表實體K棒追蹤 (100%精準對齊畫面)", "前日高低點取值方式", options = ["圖表實體K棒追蹤 (100%精準對齊畫面)", "外部日線圖(1D)數據"], group = group_src)
+extend_left = input.bool(true, "水平線向左延伸 (直接連回昨日K棒頂底)", group = group_src)
+line_len    = input.int(25, "水平線向右延伸長度 (K棒數)", minval = 5, group = group_src)
+
+// ==========================================
+// 2. 引擎 A：圖表實體 K 棒即時追蹤 (徹底根除時區與日差 Bug)
+// ==========================================
+is_new_day = ta.change(time("D")) != 0
+
+var float cur_day_open   = na
+var float cur_day_high   = na
+var float cur_day_low    = na
+var int   cur_day_start  = na
+
+var float track_prev_open  = na
+var float track_prev_high  = na
+var float track_prev_low   = na
+var float track_prev_close = na
+
+if is_new_day
+    track_prev_open  := cur_day_open
+    track_prev_high  := cur_day_high
+    track_prev_low   := cur_day_low
+    track_prev_close := close[1]
+    
+    cur_day_open   := open
+    cur_day_high   := high
+    cur_day_low    := low
+    cur_day_start  := bar_index
+else
+    cur_day_high := na(cur_day_high) ? high : math.max(cur_day_high, high)
+    cur_day_low  := na(cur_day_low)  ? low  : math.min(cur_day_low, low)
+
+// ==========================================
+// 3. 引擎 B：外部日線圖數據 (備用與 ADR5 計算)
+// ==========================================
+[sec_open, sec_high, sec_low, sec_close, sec_range, adr5] = request.security(syminfo.tickerid, "1D", [open[1], high[1], low[1], close[1], (high[1] - low[1]) * 100, ta.sma((high - low) * 100, 5)[1]], lookahead = barmerge.lookahead_on)
+
+// 最終採用的前日數據
+use_track = (calc_mode == "圖表實體K棒追蹤 (100%精準對齊畫面)") and not na(track_prev_high) and not na(track_prev_low)
+
+d_open  = use_track ? track_prev_open  : sec_open
+d_high  = use_track ? track_prev_high  : sec_high
+d_low   = use_track ? track_prev_low   : sec_low
+d_close = use_track ? track_prev_close : sec_close
+
+yesterday_range = (d_high - d_low) * 100
+
+// ==========================================
+// 4. 右上角資訊儀表板 (波幅 + 容錯 + 模式)
+// ==========================================
+group_table   = "儀表板設定"
+show_table    = input.bool(true, "顯示右上角資訊表格", group = group_table)
+toleranceLow  = yesterday_range != 0 ? 200 / yesterday_range : na
+toleranceHigh = yesterday_range != 0 ? 300 / yesterday_range : na
+
+var table adrTable = table.new(position.top_right, 2, 5, border_width = 1)
+
+// ==========================================
+// 5. 斐波那契三點擴展自動化計算與繪製
+// ==========================================
+group_fib   = "斐波那契三點擴展 (Fibo Extension)"
+show_fib    = input.bool(true, "啟用每日三點斐波自動劃分", group = group_fib)
+dir_mode    = input.string("自動判斷 (依昨日收/開價)", "擴展方向模式", options = ["自動判斷 (依昨日收/開價)", "強制上漲模式 (0在底, 1在頂)", "強制下跌模式 (0在頂, 1在底)"], group = group_fib)
+show_dashed = input.bool(true, "繪製 0 到 1 的引導虛線 (同截圖)", group = group_fib)
+
+// 判斷方向
+is_bull_auto = d_close >= d_open
+is_bull = dir_mode == "強制上漲模式 (0在底, 1在頂)" ? true : dir_mode == "強制下跌模式 (0在頂, 1在底)" ? false : is_bull_auto
+
+// 計算 10 個核心價格位
+var float p_n005 = na
+var float p_000  = na
+var float p_010  = na
+var float p_0214 = na
+var float p_030  = na
+var float p_070  = na
+var float p_0786 = na
+var float p_090  = na
+var float p_100  = na
+var float p_105  = na
+
+diff = d_high - d_low
+
+if is_bull
+    // 若前日上漲：
+    // Point 1 = PDL (0), Point 2 = PDH (1), Point 3 = PDL (0)
+    p_n005 := d_low - 0.05 * diff
+    p_000  := d_low
+    p_010  := d_low + 0.10 * diff
+    p_0214 := d_low + 0.214 * diff
+    p_030  := d_low + 0.30 * diff
+    p_070  := d_low + 0.70 * diff
+    p_0786 := d_low + 0.786 * diff
+    p_090  := d_low + 0.90 * diff
+    p_100  := d_high
+    p_105  := d_high + 0.05 * diff
+else
+    // 若前日下跌：
+    // Point 1 = PDH (0), Point 2 = PDL (1), Point 3 = PDH (0)
+    p_n005 := d_high + 0.05 * diff
+    p_000  := d_high
+    p_010  := d_high - 0.10 * diff
+    p_0214 := d_high - 0.214 * diff
+    p_030  := d_high - 0.30 * diff
+    p_070  := d_high - 0.70 * diff
+    p_0786 := d_high - 0.786 * diff
+    p_090  := d_high - 0.90 * diff
+    p_100  := d_low
+    p_105  := d_low - 0.05 * diff
+
+// 顏色配置 (完全復刻截圖配色)
+c_peach = color.rgb(235, 140, 115) // -0.05 / 1.05 刺穿緩衝區
+c_gold  = color.rgb(245, 215, 80)  // 0.0 / 1.0 關鍵極值邊界
+c_red   = color.rgb(215, 60, 75)   // 0.1 / 0.9 警戒區
+c_blue  = color.rgb(45, 115, 255)  // 0.214 / 0.786 黃金折價/溢價區
+c_gray  = color.rgb(180, 185, 195) // 0.3 / 0.7 中樞平衡區
+
+// 繪製或更新線條
+var line l_n005 = na
+var label lb_n005 = na
+var line l_000  = na
+var label lb_000  = na
+var line l_010  = na
+var label lb_010  = na
+var line l_0214 = na
+var label lb_0214 = na
+var line l_030  = na
+var label lb_030  = na
+var line l_070  = na
+var label lb_070  = na
+var line l_0786 = na
+var label lb_0786 = na
+var line l_090  = na
+var label lb_090  = na
+var line l_100  = na
+var label lb_100  = na
+var line l_105  = na
+var label lb_105  = na
+var line l_dash = na
+
+f_render_level(l_obj, lb_obj, price_val, ratio_str, col, x_start_pos) =>
+    line l_res = l_obj
+    label lb_res = lb_obj
+    x_end_pos = bar_index + line_len
+    ext_mode  = extend_left ? extend.left : extend.none
+    if na(l_res)
+        l_res := line.new(x_start_pos, price_val, x_end_pos, price_val, color = col, width = 1, extend = ext_mode)
+        lb_res := label.new(x_end_pos, price_val, ratio_str + " (" + str.tostring(price_val, "#.00") + ")", color = color.new(color.black, 100), textcolor = col, style = label.style_label_left, size = size.small)
+    else
+        line.set_xy1(l_res, x_start_pos, price_val)
+        line.set_xy2(l_res, x_end_pos, price_val)
+        line.set_color(l_res, col)
+        line.set_extend(l_res, ext_mode)
+        label.set_xy(lb_res, x_end_pos, price_val)
+        label.set_text(lb_res, ratio_str + " (" + str.tostring(price_val, "#.00") + ")")
+        label.set_textcolor(lb_res, col)
+    [l_res, lb_res]
+
+if show_fib and barstate.islast
+    x_start = na(cur_day_start) ? bar_index - 20 : cur_day_start
+
+    [l1, lb1] = f_render_level(l_n005, lb_n005, p_n005, "-0.05", c_peach, x_start)
+    l_n005 := l1
+    lb_n005 := lb1
+
+    [l2, lb2] = f_render_level(l_000, lb_000, p_000, "0", c_gold, x_start)
+    l_000 := l2
+    lb_000 := lb2
+
+    [l3, lb3] = f_render_level(l_010, lb_010, p_010, "0.1", c_red, x_start)
+    l_010 := l3
+    lb_010 := lb3
+
+    [l4, lb4] = f_render_level(l_0214, lb_0214, p_0214, "0.214", c_blue, x_start)
+    l_0214 := l4
+    lb_0214 := lb4
+
+    [l5, lb5] = f_render_level(l_030, lb_030, p_030, "0.3", c_gray, x_start)
+    l_030 := l5
+    lb_030 := lb5
+
+    [l6, lb6] = f_render_level(l_070, lb_070, p_070, "0.7", c_gray, x_start)
+    l_070 := l6
+    lb_070 := lb6
+
+    [l7, lb7] = f_render_level(l_0786, lb_0786, p_0786, "0.786", c_blue, x_start)
+    l_0786 := l7
+    lb_0786 := lb7
+
+    [l8, lb8] = f_render_level(l_090, lb_090, p_090, "0.9", c_red, x_start)
+    l_090 := l8
+    lb_090 := lb8
+
+    [l9, lb9] = f_render_level(l_100, lb_100, p_100, "1", c_gold, x_start)
+    l_100 := l9
+    lb_100 := lb9
+
+    [l10, lb10] = f_render_level(l_105, lb_105, p_105, "1.05", c_peach, x_start)
+    l_105 := l10
+    lb_105 := lb10
+
+    // 0 到 1 的虛線連結線
+    if show_dashed
+        x_dash_start = x_start
+        x_dash_end   = bar_index + line_len - 10
+        y_dash_start = p_000
+        y_dash_end   = p_100
+        if na(l_dash)
+            l_dash := line.new(x_dash_start, y_dash_start, x_dash_end, y_dash_end, color = color.rgb(245, 215, 80), style = line.style_dashed, width = 2)
+        else
+            line.set_xy1(l_dash, x_dash_start, y_dash_start)
+            line.set_xy2(l_dash, x_dash_end, y_dash_end)
+
+// 更新儀表板
+if show_table and barstate.islast
+    table.cell(adrTable, 0, 0, "昨日波幅", bgcolor=color.gray, text_color=color.white)
+    table.cell(adrTable, 1, 0, str.tostring(yesterday_range, "#.00"), bgcolor=color.orange, text_color=color.white)
+
+    table.cell(adrTable, 0, 1, "5日平均", bgcolor=color.gray, text_color=color.white)
+    table.cell(adrTable, 1, 1, str.tostring(adr5, "#.00"), bgcolor=color.blue, text_color=color.white)
+
+    table.cell(adrTable, 0, 2, "容錯低", bgcolor=color.gray, text_color=color.white)
+    table.cell(adrTable, 1, 2, str.tostring(toleranceLow, "#0.00"), bgcolor=color.green, text_color=color.white)
+
+    table.cell(adrTable, 0, 3, "容錯高", bgcolor=color.gray, text_color=color.white)
+    table.cell(adrTable, 1, 3, str.tostring(toleranceHigh, "#0.00"), bgcolor=color.purple, text_color=color.white)
+
+    table.cell(adrTable, 0, 4, "當前模組", bgcolor=color.gray, text_color=color.white)
+    table.cell(adrTable, 1, 4, is_bull ? "看多擴展 (多)" : "看空擴展 (空)", bgcolor=is_bull ? color.rgb(0, 150, 136) : color.rgb(233, 30, 99), text_color=color.white)
+
+// ==========================================
+// 6. 即時刺穿 / 假突破 / 核心水區 實戰警報系統
+// ==========================================
+sweep_top = ta.crossover(high, p_105) or (high >= p_105 and close < p_100)
+sweep_bot = ta.crossunder(low, p_n005) or (low <= p_n005 and close > p_000)
+in_golden_zone = (high >= p_070 and low <= p_0786) or (high >= p_0786 and low <= p_070)
+
+alertcondition(sweep_top, "⚠️ 頂部刺穿獵殺 (1.05 Sweep)", "XAUUSD 價格已刺入 1.05 緩衝區！留意假突破收回重畫領域！")
+alertcondition(sweep_bot, "⚠️ 底部刺穿獵殺 (-0.05 Sweep)", "XAUUSD 價格已刺入 -0.05 緩衝區！留意假突破收回重畫領域！")
+alertcondition(in_golden_zone, "🎯 進入 0.70~0.786 黃金深水區", "XAUUSD 價格已觸及 0.70~0.786 核心回踩/反彈領域！")

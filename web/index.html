@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAUUSD 專屬頂級交易系統 · 截圖 AI 戰術分析終端</title>
+  <style>
+    :root {
+      --bg-primary: #0a0c10;
+      --bg-secondary: #131722;
+      --bg-card: #1c2230;
+      --border-color: #2a3245;
+      --gold: #f5d750;
+      --gold-hover: #ffd700;
+      --green: #00e676;
+      --red: #ff3366;
+      --blue: #2979ff;
+      --text-main: #f0f3f6;
+      --text-muted: #8b95a5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 頂部 Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-gold {
+      background: rgba(245, 215, 80, 0.15);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-mode {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* 設定區塊 */
+    .config-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .input-field {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--gold);
+    }
+
+    select.input-field {
+      cursor: pointer;
+    }
+
+    /* 上傳區域 */
+    .upload-section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .dropzone {
+      background: var(--bg-secondary);
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--gold);
+      background: rgba(245, 215, 80, 0.03);
+    }
+
+    .dropzone-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+
+    .dropzone-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .dropzone-tip {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 14px auto;
+      line-height: 1.5;
+    }
+
+    .rules-alert {
+      display: inline-block;
+      background: rgba(41, 121, 255, 0.1);
+      border: 1px solid rgba(41, 121, 255, 0.3);
+      color: #64b5f6;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* 預覽區 */
+    .preview-container {
+      display: none;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .preview-img-wrapper {
+      max-height: 480px;
+      overflow: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #000;
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* 按鈕樣式 */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-hover);
+      box-shadow: 0 0 16px rgba(245, 215, 80, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #555;
+    }
+
+    .btn-copy {
+      padding: 6px 12px;
+      font-size: 12px;
+      background: rgba(245, 215, 80, 0.1);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: var(--gold);
+      color: #000;
+    }
+
+    /* 載入指示 */
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(245, 215, 80, 0.1);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+      margin: 0 auto 16px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 結果展示區 */
+    .result-section {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .journal-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      color: #e0e0e0;
+      line-height: 1.7;
+    }
+
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alert-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .alert-item:hover {
+      border-color: var(--gold);
+    }
+
+    .alert-left {
+      flex: 1;
+    }
+
+    .alert-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .alert-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .alert-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .alert-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      font-family: monospace;
+    }
+
+    .metrics-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .metric-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 10px 16px;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Toast 通知 */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gold);
+      color: #000;
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transform: translateY(100px);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 9999;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <h1>XAUUSD 專屬頂級交易系統</h1>
+        <span class="badge-gold">AI 截圖戰術終端</span>
+        <span class="badge-mode" id="envModeBadge">雲端直連模式</span>
+      </div>
+      <div>
+        <a href="https://aistudio.google.com/" target="_blank" style="font-size: 12px; color: var(--gold); text-decoration: none;">🔑 免費獲取 Gemini API Key</a>
+      </div>
+    </header>
+
+    <!-- 配置區 -->
+    <div class="config-card">
+      <div class="input-group">
+        <label for="apiKeyInput">Gemini API Key：</label>
+        <input type="password" id="apiKeyInput" class="input-field" placeholder="請在此貼上您的 Google Gemini API Key" />
+      </div>
+      <div class="input-group" style="max-width: 220px;">
+        <label for="modelSelect">模型：</label>
+        <select id="modelSelect" class="input-field">
+          <option value="gemini-2.5-flash" selected>gemini-2.5-flash (推薦極速)</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash (穩定)</option>
+          <option value="gemini-1.5-pro">gemini-1.5-pro (深度推理)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 上傳區 -->
+    <div class="upload-section" id="uploadSection">
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">📷</div>
+        <div class="dropzone-title">拖曳截圖至此，或點擊選擇檔案</div>
+        <div class="dropzone-tip">
+          ★ 支持剪貼簿！在 TradingView 複製截圖後，直接在此頁面按 <strong>Ctrl + V</strong> 即可自動貼上！<br>
+          ★ 手機使用：直接點擊此處從相簿選取截圖即可！
+        </div>
+        <div class="rules-alert">
+          ⚠️ 截圖規範：必須且僅能包含「前一日完整 K 棒 + FIBO 擴展指標 + 右上角波幅資訊」，無其他多日雜訊。
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+      </div>
+    </div>
+
+    <!-- 預覽與操作按鈕 -->
+    <div class="preview-container" id="previewContainer">
+      <div class="preview-header">
+        <span style="font-size: 14px; font-weight: 600; color: #fff;">截圖預覽 (已就緒)</span>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-outline" id="reselectBtn">重新選取</button>
+          <button class="btn btn-gold" id="startAnalyzeBtn">⚡ 立即啟動大師級分析</button>
+        </div>
+      </div>
+      <div class="preview-img-wrapper">
+        <img id="previewImg" class="preview-img" src="" alt="截圖預覽" />
+      </div>
+    </div>
+
+    <!-- 載入中動畫 -->
+    <div class="loading-spinner" id="loadingSpinner">
+      <div class="spinner"></div>
+      <div style="font-size: 16px; font-weight: 600; color: var(--gold);">交易大師 AI 正審核前日 K 棒、FIBO 擴展與波幅邊界...</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">檢核回調取消 7 大情境 · 檢驗 PDH/PDL 有效性 · 產出作戰日誌與價位提醒</div>
+    </div>
+
+    <!-- 結果展示區 -->
+    <div class="result-section" id="resultSection">
+      <!-- 頂部指標 -->
+      <div class="metrics-bar" id="metricsBar">
+        <div class="metric-badge">
+          <div class="metric-label">前日定性</div>
+          <div class="metric-value" id="valQuality">--</div>
+        </div>
+        <div class="metric-badge">
+          <div class="metric-label">昨日波幅</div>
+          <div class="metric-value" id="valYesterdayRange" style="color: #ff9800;">--</div>
+        </div>
+        <div class="metric-badge">
+          <div class="metric-label">前 5 日平均波幅</div>
+          <div class="metric-value" id="valAdr5" style="color: #29b6f6;">--</div>
+        </div>
+        <div class="metric-badge">
+          <div class="metric-label">PDH/PDL 狀態</div>
+          <div class="metric-value" id="valPdhStatus">--</div>
+        </div>
+      </div>
+
+      <!-- 核心網格佈局 -->
+      <div class="grid-2">
+        <!-- 左卡片：步驟五 作戰日誌 -->
+        <div class="card">
+          <div class="card-title">
+            <span>📋 當日作戰日誌 (標準範本)</span>
+            <button class="btn-copy" id="copyJournalBtn">一鍵複製日誌</button>
+          </div>
+          <div class="journal-box" id="journalContent">正在載入日誌...</div>
+        </div>
+
+        <!-- 右卡片：TradingView 提醒設置價位 -->
+        <div class="card">
+          <div class="card-title">
+            <span>🔔 TradingView 關鍵價位提醒設置清單</span>
+            <button class="btn-copy" id="copyAlertsBtn">一鍵複製全部提醒</button>
+          </div>
+          <div class="alert-list" id="alertList">
+            <!-- 動態生成警報卡片 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部卡片：大師級專業點評 -->
+      <div class="card">
+        <div class="card-title">
+          <span>🧠 交易大師深度局勢剖析與風控叮嚀</span>
+        </div>
+        <div id="masterSummary" style="font-size: 14px; color: #cfd8dc; line-height: 1.8;">
+          --
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">已成功複製到剪貼簿！</div>
+
+  <script>
+    // 專屬系統 System Prompt
+    const SYSTEM_PROMPT = `
+你是一位頂級 XAUUSD (黃金) 專業機構交易大師，負責執行嚴格的【XAUUSD 專屬頂級交易系統】。
+使用者會上傳一張「畫好 FIBO 擴展指標且僅包含前一日完整 K 棒與右上角波幅資訊」的 TradingView 圖表截圖。
+
+【嚴格截圖驗證】：
+- 截圖必須「只能是前一日搭配指標的截圖（不能有額外多日雜訊或無指標圖表）」。
+- 如果截圖不符合規範（例如跨越過多天數、無指標線或無波幅儀表板），請在分析報告最上方明確警示。
+
+【五大步驟標準分析流程】：
+1. 步驟一：前日定性
+   - 判斷前一日是「前日上漲」還是「前日下跌」。
+   - 若前一日未破前天 PDH 和 PDL，標註「震盪收縮日(需搭配TL並觀望)」。
+   - 若前一日為極端急漲 / 急跌，標註「漲動能過激日」或「跌動能過激日」。
+
+2. 步驟二：FIBO 擴展與波幅數據辨識
+   - 辨識圖表右上角儀表板數值：昨日波幅、前五日平均波幅。
+   - 辨識 10 條 FIBO 線價位：1.05, 1.00(PDH/PDL), 0.90, 0.786, 0.70, 0.30, 0.214, 0.10, 0.00(PDL/PDH), -0.05。
+
+3. 步驟三：回調點有效性檢驗 (檢核 7 大取消情境)
+   - 1. 若回調點是前一日的 H1 倒數三根 K 棒則取消
+   - 2. 回調在領域內
+   - 3. PDH 或當日出現反轉空或開盤下跳則取消回調低（易下破）
+   - 4. PDL 或當日出現反轉多或開盤上跳則取消回調高（易上破）
+   - 5. 前一日急跌則取消回調低（易下破）
+   - 6. 前一日急漲則取消回調高（易上破）
+   - 7. 前一日未破前天的 PDH 和 PDL
+   - 鐵律提醒：「使用回調點進場前需觀望且配合 TL 或盤勢轉換」。
+
+4. 步驟四：PDH / PDL 狀態與有效性判定
+   - 檢核 5 大無效與取代判定 (提早休市未滿23根、來回三段、跳價未回補無回調、關盤0.9~1或PDH/PDL注意假突破、關盤0.3~0.7觀望至亞盤END搭配TL)。
+   - 檢核 8 大觀望或有效判定①~⑧。
+   - 檢核 4 大特殊情形 (反轉收回重畫領域、收回轉折區等回調領域、不破非反轉先回調再破可用當日回調、強趨勢破搭配TL)。
+
+5. 步驟五：產出當日對應策略與作戰日誌
+
+【回測風控三大鐵律】：
+1. 拒絕在同一個盤勢裡多次試單。
+2. 獲利為止損兩倍時可平倉一半，是否做保本看進場位置是否容易被掃掉。
+3. 若止損要更多，則手數需更加保守。
+
+【必須輸出的 JSON 格式】：
+請一律以繁體中文（台灣）輸出，並遵循以下 JSON 結構：
+\`\`\`json
+{
+  "is_valid_screenshot": true,
+  "validation_note": "截圖符合規範：包含前一日完整K棒與指標數值",
+  "daily_journal": {
+    "date": "2026-XX-XX",
+    "step1_quality": "前日上漲 / 前日下跌 / [標註：震盪收縮日(需搭配TL並觀望) / 漲動能過激日 / 跌動能過激日]",
+    "step2_range": {
+      "yesterday_range": "XXXX",
+      "adr5": "XXXX"
+    },
+    "step3_pullback": {
+      "has_pullback": "是 / 否",
+      "close_region": "例如：0.7~0.9 / 0.3~0.7 / 0.1~0.3 / 領域內 0~0.1 等",
+      "is_gap": "正常無跳價 / 開盤上跳 / 開盤下跳",
+      "use_prev_two_days_pdh_pdl": "是 / 否"
+    },
+    "step4_pdh_pdl_validity": "有效 / 觀望 / SL要多抓 / 領域失效(等亞盤END) / 重畫領域",
+    "step5_strategy": "寫出今日用此系統採取什麼策略"
+  },
+  "alerts_to_set": [
+    {
+      "name": "0.786 黃金深水區多單提醒",
+      "price": "XXXX.XX",
+      "condition": "價格向下穿越",
+      "action_reminder": "配合 M15 TL 突破進場，首探 H1 不破出手"
+    }
+  ],
+  "master_analysis_summary": "交易大師對當前局勢的專業剖析與操作叮嚀"
+}
+\`\`\`
+`;
+
+    // 元素綁定
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const modelSelect = document.getElementById('modelSelect');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadSection = document.getElementById('uploadSection');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImg = document.getElementById('previewImg');
+    const reselectBtn = document.getElementById('reselectBtn');
+    const startAnalyzeBtn = document.getElementById('startAnalyzeBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const resultSection = document.getElementById('resultSection');
+    const toast = document.getElementById('toast');
+    const envModeBadge = document.getElementById('envModeBadge');
+
+    let currentBase64Image = null;
+    let latestAnalysisResult = null;
+
+    // 檢測目前運行環境
+    const isLocalServer = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
+    if (isLocalServer) {
+      envModeBadge.innerText = '🟢 本機伺服器模式';
+      envModeBadge.style.color = 'var(--green)';
+      envModeBadge.style.borderColor = 'var(--green)';
+    } else {
+      envModeBadge.innerText = '🌐 雲端直連模式 (免安裝)';
+      envModeBadge.style.color = 'var(--gold)';
+      envModeBadge.style.borderColor = 'var(--gold)';
+    }
+
+    // 本地持久化 API Key
+    const savedApiKey = localStorage.getItem('gemini_api_key_xauusd');
+    if (savedApiKey) apiKeyInput.value = savedApiKey;
+
+    apiKeyInput.addEventListener('change', () => {
+      localStorage.setItem('gemini_api_key_xauusd', apiKeyInput.value.trim());
+    });
+
+    // 拖曳上傳
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    // 支援 Ctrl + V 剪貼簿貼上
+    window.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (let item of items) {
+        if (item.type.indexOf('image') !== -1) {
+          const file = item.getAsFile();
+          handleFile(file);
+          showToast('已從剪貼簿載入截圖！');
+          break;
+        }
+      }
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('請上傳圖片格式檔案 (JPG, PNG, WEBP)！');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentBase64Image = e.target.result;
+        previewImg.src = currentBase64Image;
+        uploadSection.style.display = 'none';
+        previewContainer.style.display = 'block';
+        resultSection.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    reselectBtn.addEventListener('click', () => {
+      currentBase64Image = null;
+      fileInput.value = '';
+      uploadSection.style.display = 'block';
+      previewContainer.style.display = 'none';
+      resultSection.style.display = 'none';
+    });
+
+    // 啟動分析
+    startAnalyzeBtn.addEventListener('click', async () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        alert('請先輸入 Google Gemini API Key！');
+        apiKeyInput.focus();
+        return;
+      }
+      if (!currentBase64Image) {
+        alert('請先上傳或貼上截圖！');
+        return;
+      }
+
+      previewContainer.style.display = 'none';
+      loadingSpinner.style.display = 'block';
+      resultSection.style.display = 'none';
+
+      try {
+        let data;
+        // 優先嘗試後端，若失敗或處於純靜態雲端則直連 Google 官方 API
+        if (isLocalServer) {
+          try {
+            const resp = await fetch('/api/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                api_key: apiKey,
+                model: modelSelect.value,
+                image_base64: currentBase64Image
+              })
+            });
+            if (resp.ok) {
+              data = await resp.json();
+            } else {
+              data = await callGeminiDirectly(apiKey, modelSelect.value, currentBase64Image);
+            }
+          } catch(err) {
+            data = await callGeminiDirectly(apiKey, modelSelect.value, currentBase64Image);
+          }
+        } else {
+          data = await callGeminiDirectly(apiKey, modelSelect.value, currentBase64Image);
+        }
+
+        latestAnalysisResult = data;
+        renderResults(data);
+      } catch (err) {
+        alert(`❌ 分析發生錯誤：\n${err.message}`);
+        previewContainer.style.display = 'block';
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
+    });
+
+    // 瀏覽器端安全直連 Google Gemini API
+    async function callGeminiDirectly(apiKey, model, imageBase64) {
+      let mimeType = 'image/png';
+      let cleanB64 = imageBase64;
+      if (imageBase64.includes(',')) {
+        const parts = imageBase64.split(',', 2);
+        if (parts[0].includes('jpeg') || parts[0].includes('jpg')) mimeType = 'image/jpeg';
+        else if (parts[0].includes('webp')) mimeType = 'image/webp';
+        cleanB64 = parts[1];
+      }
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [
+          {
+            parts: [
+              { text: SYSTEM_PROMPT + "\n\n請仔細檢視這張 XAUUSD 圖表截圖，嚴格依據系統手冊規範進行判斷，並輸出合規的 JSON。" },
+              {
+                inline_data: {
+                  mime_type: mimeType,
+                  data: cleanB64
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          response_mime_type: "application/json"
+        }
+      };
+
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) {
+        const errText = await resp.text();
+        let msg = errText;
+        try {
+          const errObj = JSON.parse(errText);
+          msg = errObj.error?.message || errText;
+        } catch(e) {}
+        throw new Error(`Google API 請求失敗 (${resp.status}): ${msg}`);
+      }
+
+      const resJson = await resp.json();
+      const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) throw new Error("Gemini 未返回有效結果");
+
+      let clean = rawText.trim();
+      if (clean.startsWith("```json")) clean = clean.substring(7);
+      if (clean.endsWith("```")) clean = clean.substring(0, clean.length - 3);
+      return JSON.parse(clean.trim());
+    }
+
+    // 渲染分析結果
+    function renderResults(data) {
+      const j = data.daily_journal || {};
+
+      document.getElementById('valQuality').innerText = j.step1_quality || '--';
+      document.getElementById('valYesterdayRange').innerText = (j.step2_range && j.step2_range.yesterday_range) || '--';
+      document.getElementById('valAdr5').innerText = (j.step2_range && j.step2_range.adr5) || '--';
+      document.getElementById('valPdhStatus').innerText = j.step4_pdh_pdl_validity || '--';
+
+      const formattedJournal = 
+`【日期】：${j.date || new Date().toISOString().split('T')[0]}
+【步驟一：前日定性】：${j.step1_quality || '未定性'}
+
+【步驟二：波幅數據】：
+  * 昨日波幅：${(j.step2_range && j.step2_range.yesterday_range) || '無數據'}
+  * 前五日平均波幅：${(j.step2_range && j.step2_range.adr5) || '無數據'}
+
+【步驟三：回調點判定】：
+  * 是否回調：${(j.step3_pullback && j.step3_pullback.has_pullback) || '否'}
+  * 收盤區域在哪：${(j.step3_pullback && j.step3_pullback.close_region) || '領域外'}
+  * 是否上跳或下跳：${(j.step3_pullback && j.step3_pullback.is_gap) || '正常無跳價'}
+  * 使用前天 PDH 和 PDL：${(j.step3_pullback && j.step3_pullback.use_prev_two_days_pdh_pdl) || '否'}
+
+【步驟四：PDH / PDL 有效性】：
+  * 判定結果：${j.step4_pdh_pdl_validity || '觀望'}
+
+【步驟五：當日策略】：
+  * 今日策略：${j.step5_strategy || '觀望至亞盤 END'}`;
+
+      document.getElementById('journalContent').innerText = formattedJournal;
+
+      const alertListEl = document.getElementById('alertList');
+      alertListEl.innerHTML = '';
+      const alerts = data.alerts_to_set || [];
+
+      if (alerts.length === 0) {
+        alertListEl.innerHTML = '<div style="color: #888; font-size: 13px;">無特殊提醒價位需設置。</div>';
+      } else {
+        alerts.forEach((alt) => {
+          const item = document.createElement('div');
+          item.className = 'alert-item';
+          item.innerHTML = `
+            <div class="alert-left">
+              <div class="alert-name">${alt.name || '價格提醒'}</div>
+              <div class="alert-meta">條件：${alt.condition || '觸碰'}</div>
+              <div class="alert-meta" style="color: #90caf9;">動作：${alt.action_reminder || '觀察反應'}</div>
+            </div>
+            <div class="alert-right">
+              <div class="alert-price">${alt.price || '--'}</div>
+              <button class="btn-copy" onclick="copyText('${alt.price}')">複製價位</button>
+            </div>
+          `;
+          alertListEl.appendChild(item);
+        });
+      }
+
+      document.getElementById('masterSummary').innerHTML = (data.master_analysis_summary || '保持耐心，嚴守風控紀律。').replace(/\n/g, '<br>');
+      resultSection.style.display = 'block';
+      resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('copyJournalBtn').addEventListener('click', () => {
+      const text = document.getElementById('journalContent').innerText;
+      copyText(text);
+    });
+
+    document.getElementById('copyAlertsBtn').addEventListener('click', () => {
+      if (!latestAnalysisResult || !latestAnalysisResult.alerts_to_set) return;
+      const lines = latestAnalysisResult.alerts_to_set.map(a => 
+        `【${a.name}】價位: ${a.price} | 條件: ${a.condition} | 動作: ${a.action_reminder}`
+      );
+      copyText(lines.join('\n'));
+    });
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已複製到剪貼簿！');
+      }).catch(err => {
+        alert('複製失敗，請手動選取複製');
+      });
+    }
+
+    function showToast(msg) {
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
+    }
+  </script>
+</body>
+</html>
