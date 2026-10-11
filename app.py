@@ -167,7 +167,7 @@ class TradingSystemHandler(SimpleHTTPRequestHandler):
                 mime_type = "image/png"
 
             # 呼叫 Gemini REST API (支援候選模型自動容錯降級)
-            candidate_models = [model_name, "gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+            candidate_models = [model_name, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.8-flash"]
             seen = set()
             unique_models = [m for m in candidate_models if not (m in seen or seen.add(m))]
 
@@ -179,8 +179,8 @@ class TradingSystemHandler(SimpleHTTPRequestHandler):
                     return
                 except Exception as e:
                     last_err = e
-                    err_str = str(e)
-                    if "404" in err_str or "no longer available" in err_str or "not found" in err_str:
+                    err_str = str(e).lower()
+                    if any(k in err_str for k in ["503", "high demand", "spikes in demand", "overloaded", "404", "no longer available", "not found", "429", "resource_exhausted", "quota"]):
                         continue
                     raise e
             if last_err:

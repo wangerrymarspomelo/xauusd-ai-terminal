@@ -677,9 +677,9 @@
       <div class="input-group" style="max-width: 220px;">
         <label for="modelSelect">模型：</label>
         <select id="modelSelect" class="input-field">
-          <option value="gemini-3.8-flash" selected>gemini-3.8-flash (官方推薦極速)</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash (穩定推薦)</option>
-          <option value="gemini-1.5-flash">gemini-1.5-flash (標準相容)</option>
+          <option value="gemini-2.0-flash" selected>gemini-2.0-flash (推薦最穩最快)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash (最新旗艦 · 尖峰易忙)</option>
+          <option value="gemini-1.5-flash">gemini-1.5-flash (標準相容穩定)</option>
           <option value="gemini-1.5-pro">gemini-1.5-pro (深度長文推理)</option>
         </select>
       </div>
@@ -718,8 +718,8 @@
     <!-- 載入中動畫 -->
     <div class="loading-spinner" id="loadingSpinner">
       <div class="spinner"></div>
-      <div style="font-size: 16px; font-weight: 600; color: var(--gold);">交易大師 AI 正審核前日 K 棒、FIBO 擴展與波幅邊界...</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">檢核回調取消 7 大情境 · 檢驗 PDH/PDL 有效性 · 產出作戰日誌與價位提醒</div>
+      <div id="spinnerText" style="font-size: 16px; font-weight: 600; color: var(--gold);">交易大師 AI 正審核前日 K 棒、FIBO 擴展與波幅邊界...</div>
+      <div id="spinnerSubtext" style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">檢核回調取消 7 大情境 · 檢驗 PDH/PDL 有效性 · 產出作戰日誌與價位提醒</div>
     </div>
 
     <!-- 結果展示區 -->
@@ -1093,35 +1093,74 @@
       }
     });
 
+    // 檢測是否為可自動切換/重試的伺服器暫態錯誤 (如 503 尖峰忙碌、429 限流、404 模型異動)
+    function isRetryableError(msg) {
+      if (!msg) return false;
+      const m = msg.toLowerCase();
+      return (
+        m.includes('503') ||
+        m.includes('high demand') ||
+        m.includes('spikes in demand') ||
+        m.includes('overloaded') ||
+        m.includes('temporarily') ||
+        m.includes('429') ||
+        m.includes('resource_exhausted') ||
+        m.includes('quota') ||
+        m.includes('rate limit') ||
+        m.includes('404') ||
+        m.includes('no longer available') ||
+        m.includes('not found') ||
+        m.includes('500') ||
+        m.includes('502') ||
+        m.includes('504') ||
+        m.includes('service unavailable')
+      );
+    }
+
     // 瀏覽器端安全直連 Google Gemini API (支援智慧自動降級容錯切換)
     async function callGeminiDirectly(apiKey, preferredModel, imageBase64) {
-      // 容錯備選模型清單：優先嘗試使用者選擇的模型，遇到 404/不可用則自動嘗試替代模型
+      const spinnerText = document.getElementById('spinnerText');
+      const spinnerSubtext = document.getElementById('spinnerSubtext');
+
+      // 容錯備選模型清單：優先嘗試使用者選擇的模型，再依序嘗試最穩定的備用模型
       const candidateModels = [
         preferredModel,
-        'gemini-3.8-flash',
         'gemini-2.0-flash',
-        'gemini-1.5-flash'
+        'gemini-1.5-flash',
+        'gemini-3.8-flash'
       ];
       const uniqueModels = [...new Set(candidateModels)];
 
       let lastError = null;
-      for (const model of uniqueModels) {
-        try {
-          return await executeGeminiRequest(apiKey, model, imageBase64);
-        } catch (err) {
-          lastError = err;
-          // 若為 404 或該模型對新用戶不可用，自動切換至備用模型重試
-          if (err.message && (
-            err.message.includes('404') || 
-            err.message.includes('no longer available') || 
-            err.message.includes('not found')
-          )) {
-            console.warn(`[Gemini Fallback] 模型 ${model} 不可用，正在自動切換備用模型...`);
-            continue;
+
+      // 進行 2 輪嘗試（第一輪切換不同備選模型，第二輪若仍遇尖峰則稍候重試）
+      for (let round = 1; round <= 2; round++) {
+        for (const model of uniqueModels) {
+          try {
+            if (spinnerText) spinnerText.innerText = `交易大師 AI 正使用 ${model} 審核圖表...`;
+            return await executeGeminiRequest(apiKey, model, imageBase64);
+          } catch (err) {
+            lastError = err;
+            if (isRetryableError(err.message)) {
+              console.warn(`[Gemini Fallback] 模型 ${model} 回報暫態繁忙或不可用 (${err.message})，正在切換...`);
+              if (spinnerSubtext) {
+                spinnerSubtext.innerText = `⚠️ ${model} 伺服器尖峰忙碌 (503)，系統已自動切換備用模型重試中...`;
+              }
+              await new Promise(r => setTimeout(r, 600));
+              continue;
+            }
+            // 400/403 等致命錯誤（如 API Key 錯誤）直接拋出
+            throw err;
           }
-          // 其他類型錯誤（如金鑰無效、格式錯誤等）直接拋出
-          throw err;
         }
+        if (round < 2) {
+          if (spinnerSubtext) spinnerSubtext.innerText = `⚠️ Google 伺服器全球流量暫時尖峰，正在自動二次重試中，請稍候...`;
+          await new Promise(r => setTimeout(r, 1200));
+        }
+      }
+
+      if (lastError && (lastError.message.includes('503') || lastError.message.includes('high demand'))) {
+        throw new Error("Google 官方伺服器目前全球瞬時尖峰負載 (503 High Demand)。\n系統已為您自動重試多次，請稍候 5~10 秒再次點擊分析，或在上方模型下拉選單切換為「gemini-2.0-flash」！");
       }
       throw lastError;
     }
